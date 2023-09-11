@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chating</title>
+</head>
+<body>
+    <h1>Bienvenido a mi chat</h1>
+    <div id="output">Waiting for content...</div>
+    <form action="send/" method="post" id="chatForm">
+        <textarea name="message" id="message" cols="100" rows="10"></textarea>
+        <input type="submit" value="Enviar" />
+    </form>
+    <script>
+
+document.getElementById('chatForm').addEventListener('submit', async function(e) {
+    e.preventDefault(); // Evita la acción predeterminada del formulario (recargar la página)
+
+    const formData = new FormData(e.target); // Obtener los datos del formulario
+    const outputDiv = document.getElementById('output');
+
+    try {
+        const response = await fetch(e.target.action, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            const reader = response.body.getReader();
+
+            while (true) {
+                const { done, value } = await reader.read();
+
+                if (done) {
+                    break;
+                }
+
+                outputDiv.textContent += new TextDecoder().decode(value);
+            }
+        } else {
+            outputDiv.textContent = 'Error al enviar el mensaje';
+        }
+    } catch (error) {
+        outputDiv.textContent = 'Error de conexión';
+    }
+});
+    </script>
+</body>
+</html>
