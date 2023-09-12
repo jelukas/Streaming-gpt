@@ -21,5 +21,7 @@ from chatin import views
 
 urlpatterns = [
     path("", views.home, name="home"),
+    path("v2/", views.advanced_home, name="advanced_home"),
+    path("send_v2/", views.advanced_chatgpt_stream_response, name="advanced_chatgpt_stream_response"),
     path("send/", views.chatgpt_stream_response, name="send"),
 ]

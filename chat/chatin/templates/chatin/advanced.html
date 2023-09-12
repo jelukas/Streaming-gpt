@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <title>Chating</title>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col">
+
+<div class="container mx-auto max-w-screen-md h-full flex flex-col">
+    <h1 class="text-3xl font-bold p-5">Bienvenido a mi chat</h1>
+
+    <div id="output" class="flex-1 overflow-y-auto p-5 bg-white border rounded-lg space-y-4">
+        <div class="text-center text-gray-600">Waiting for content...</div>
+    </div>
+
+    <form action="/send_v2/" method="post" id="chatForm" class="mt-4 p-5">
+        <textarea name="message" id="message" cols="100" rows="3" class="w-full p-2 border rounded-md"></textarea>
+        <input type="submit" value="Enviar" class="mt-2 bg-blue-600 text-white py-1 px-4 rounded hover:bg-blue-700 transition duration-200"/>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script>
+    document.getElementById('chatForm').addEventListener('submit', async function(e) {
+        e.preventDefault(); 
+    
+        const userMessage = document.getElementById('message').value;
+    
+        const formData = new FormData(e.target); 
+        const outputDiv = document.getElementById('output');
+    
+        const userMessageDiv = document.createElement("div");
+        userMessageDiv.innerHTML = `<div class="p-3 rounded bg-blue-200 w-3/4 self-end text-right">User: ${userMessage}</div>`;
+        outputDiv.appendChild(userMessageDiv);
+    
+        const botMessageDiv = document.createElement("div");
+        botMessageDiv.classList.add("p-3", "rounded", "bg-green-200", "w-3/4", "self-start");
+        outputDiv.appendChild(botMessageDiv);
+    
+        try {
+            const response = await fetch(e.target.action, {
+                method: 'POST',
+                body: formData
+            });
+    
+            if (response.ok) {
+                const reader = response.body.getReader();
+                let messageContent = "";
+    
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        break;
+                    }
+    
+                    messageContent += new TextDecoder().decode(value);
+                    //botMessageDiv.textContent = messageContent;
+                    botMessageDiv.innerHTML = marked.parse(messageContent);
+                }
+    
+                outputDiv.scrollTop = outputDiv.scrollHeight;
+    
+            } else {
+                outputDiv.innerHTML += '<div class="text-center text-red-600">Error al enviar el mensaje</div>';
+            }
+        } catch (error) {
+            console.log(error);
+            outputDiv.innerHTML += '<div class="text-center text-red-600">Error de conexión</div>';
+        }
+    });
+    </script>
+    
+
+</body>
+</html>
