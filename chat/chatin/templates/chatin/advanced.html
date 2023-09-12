@@ -17,6 +17,7 @@
 
     <form action="/send_v2/" method="post" id="chatForm" class="mt-4 p-5">
         <textarea name="message" id="message" cols="100" rows="3" class="w-full p-2 border rounded-md"></textarea>
+        <input type="hidden" name="chat_uuid" value="{{ chat_uuid }}">
         <input type="submit" value="Enviar" class="mt-2 bg-blue-600 text-white py-1 px-4 rounded hover:bg-blue-700 transition duration-200"/>
     </form>
 </div>
